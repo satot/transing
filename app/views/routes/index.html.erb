@@ -1,1 +1,59 @@
-<%= react_component('RouteIndex') %>
+<%= form_tag('/search', class: "my-3", method: "get") do %>
+  <div class="form-inline">
+    <%= text_field_tag "destination", "", class: "form-control mr-2 col", placeholder: "Where do you want to go?" %>
+    <%= hidden_field_tag "lat", "", class: "form-control" %>
+    <%= hidden_field_tag "lng", "", class: "form-control" %>
+    <button id="submit" type="submit" class="btn btn-outline-dark" disabled>
+      <i class="fa fa-search my-0 ml-auto" aria-hidden="true"></i>
+    </button>
+  </div>
+<% end %>
+
+<table class="table">
+  <thead class="thead-default">
+    <tr><th>Saved Routes</th></tr>
+  </thead>
+  <tbody>
+    <tr><td>
+      <span>Great World City</span>
+      <small class="form-text text-muted">1 Kim Seng Promenade, Singapore 237994</small>
+    </td></tr>
+  </tbody>
+</table>
+<table class="table">
+  <thead class="thead-default">
+    <tr><th>Recent Journeys</th></tr>
+  </thead>
+  <tbody>
+    <tr><td>
+      <span>Great World City</span>
+      <small class="form-text text-muted">1 Kim Seng Promenade, Singapore 237994</small>
+    </td></tr>
+    <tr><td>
+      <span>Ubi Techpark</span>
+      <small class="form-text text-muted">10Ubi Crescent, Singapore 408564</small>
+    </td></tr>
+    <tr><td>
+      <span>40R East Coast</span>
+      <small class="form-text text-muted">Singapore 429093</small>
+    </td></tr>
+    <tr><td>
+      <span>The Octagon</span>
+      <small class="form-text text-muted">105 Cecil Street, Singapore 069534</small>
+    </td></tr>
+  </tbody>
+</table>
+
+<script>
+$(document).ready(function(){
+  getPosition().then(function(position){
+    if(position !== undefined){
+      document.getElementById("lat").value = position[0];
+      document.getElementById("lng").value = position[1];
+      $("#submit").prop("disabled", false);
+    }
+  }).catch(function(error){
+    console.log(error);
+  });
+});
+</script>

@@ -1,0 +1,43 @@
+<table class="table">
+  <tbody>
+    <tr><td>
+      <span>Current Location</span>
+      <small class="form-text text-muted"><%= @start_address %></small>
+    </td></tr>
+    <tr><td>
+      <span><%= @destination %></span>
+      <small class="form-text text-muted"><%= @end_address %></small>
+    </td></tr>
+  </tbody>
+</table>
+
+<ul class="nav nav-tabs" id="myTab" role="tablist">
+  <% @routes.each_with_index do |route, idx| %>
+  <% active = idx == 0 ? "active" : "" %>
+  <% leg = route["legs"].first %>
+  <li class="nav-item">
+  <a class="nav-link <%= active %>" id="route<%= idx %>-tab" data-toggle="tab" href="#route<%= idx %>" role="tab"><%= leg["duration"]["text"] %></a>
+  </li>
+  <% end %>
+</ul>
+<div class="tab-content" id="myTabContent">
+  <% @routes.each_with_index do |route, idx| %>
+  <% active = idx == 0 ? "show active" : "" %>
+<div class="tab-pane fade <%= active %>" id="route<%= idx %>" role="tabpanel">
+<table class="table">
+  <tbody>
+  <% leg = route["legs"].first %>
+  <% leg["steps"].each do |step| %>
+    <tr><td>
+      <small class="form-text text-muted"><%= step["travel_mode"] %></small>
+      <span><%= step["html_instructions"] %></span>
+      <small class="form-text text-muted"><%= step["distance"]["text"] %> <%= step["duration"]["text"] %></small>
+    </td></tr>
+  <% end %>
+  </tbody>
+</table>
+</div>
+  <% end %>
+</div>
+
+<button type="button" class="btn btn-success btn-block fixed-bottom rounded-0">Start My Journey Now <i class="fa fa-chevron-circle-right" aria-hidden="true"></i></button>

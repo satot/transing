@@ -27,5 +27,11 @@ module Transing
 
     # Don't generate system test files.
     config.generators.system_tests = nil
+    config.cache_store = :redis_store, {
+      host: ENV["REDIS_HOST"] || "localhost",
+      port: 6379,
+      db: 0,
+      namespace: "cache"
+    }
   end
 end

@@ -1,0 +1,14 @@
+<nav class="navbar navbar-toggleable-md navbar-light bg-faded">
+<% if @header %>
+<div class="navbar-brand d-flex">
+  <div class="p-2">
+    <a style="color:black;" href="/"><i class="fa fa-lg fa-angle-left" aria-hidden="true"></i></a>
+  </div>
+  <div class="m-auto p-2"><%= @header %></div>
+</div>
+<% else %>
+<a class="navbar-brand font-weight-bold text-success mx-auto" href="/">
+  <i class="fa fa-lg fa-map-marker" aria-hidden="true"></i>&nbsp;TranSing
+</a>
+<% end %>
+</nav>
