@@ -1,3 +1,29 @@
 // Place all the styles related to the routes controller here.
 // They will automatically be included in application.css.
 // You can use Sass (SCSS) here: http://sass-lang.com/
+
+.carousel-indicators--round {
+  li {
+    border-radius: 10px;
+    margin: 1px 3px;
+    height: 10px;
+    max-width: 10px;
+    border: 1px solid #000;
+    background-color: transparent;
+  }
+}
+.carousel-indicators {
+  .active {
+    background-color: #000;
+    max-width: 12px;
+    margin: 0 3px;
+    height: 12px;
+  }
+}
+.carousel-control-prev, .carousel-control-next{
+  top: -45px;
+  color: #000;
+  &:hover {
+    color: #000;
+  }
+}
