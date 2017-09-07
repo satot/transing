@@ -1,5 +1,5 @@
 class RoutesController < ApplicationController
-  before_action :set_route, only: [:show]
+  before_action :set_route, :set_weather, only: [:show]
 
   def index
   end
@@ -34,5 +34,10 @@ class RoutesController < ApplicationController
 
   def set_route
     @route = Route.find(params[:id])
+  end
+
+  def set_weather
+    sl = @route.steps.first.start_location
+    @weather = Weather.new(sl["lat"], sl["lng"]).get_latest
   end
 end

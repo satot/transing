@@ -2,6 +2,16 @@
 // They will automatically be included in application.css.
 // You can use Sass (SCSS) here: http://sass-lang.com/
 
+@font-face {
+  font-family: 'WeatherAndTime';
+  src: url(font-path('weather-and-time/weather-and-time.ttf'));
+}
+
+.weather {
+  font-family: 'WeatherAndTime';
+  font-size: 1.5rem;
+}
+
 .carousel-indicators--round {
   li {
     border-radius: 10px;
