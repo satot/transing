@@ -1,0 +1,107 @@
+<div id="map" style="width:100%; height:500px"></div>
+
+<div id="routesCarousel" class="carousel slide" data-ride="carousel" data-interval="false" data-wrap="false">
+  <ol class="carousel-indicators carousel-indicators--round fixed-bottom">
+<% @route.steps.each_with_index do |step, idx| %>
+<% active = idx === 0 ? "active" : "" %>
+    <li data-target="#routesCarousel" data-slide-to="<%= idx %>" class="<%= active %>"></li>
+<% end %>
+  </ol>
+
+  <div class="carousel-inner">
+<% @route.steps.each_with_index do |step, idx| %>
+<% content = JSON.parse(step.content) %>
+<% active = idx === 0 ? "active" : "" %>
+<div class="carousel-item <%= active %>" data-route-index="<%= idx %>" data-route="<%= content.to_json %>">
+<table class="table">
+  <tbody>
+    <tr><td>
+      <small class="form-text text-muted"><%= content["travel_mode"] %></small>
+      <span><%= content["html_instructions"] %></span>
+      <small class="form-text text-muted"><%= content["distance"]["text"] + " " + content["duration"]["text"] %></small>
+    </td></tr>
+  </tbody>
+</table>
+</div>
+<% end %>
+  </div>
+
+  <div class="fixed-bottom">
+  <a class="carousel-control-prev" href="#routesCarousel" role="button" data-slide="prev" onClick="updateRoute(false)">
+    <i class="fa fa-lg fa-angle-left" aria-hidden="true"></i>
+    <span class="sr-only">Previous</span>
+  </a>
+  <a class="carousel-control-next" href="#routesCarousel" role="button" data-slide="next" onClick="updateRoute(true)">
+    <i class="fa fa-lg fa-angle-right" aria-hidden="true"></i>
+    <span class="sr-only">Next</span>
+  </a>
+  </div>
+</div>
+
+<% step = @route.steps.first %>
+<% content = JSON.parse(step.content) %>
+<script type="text/javascript">
+  function initMap() {
+    // global
+    directionsService = new google.maps.DirectionsService;
+    directionsDisplay = new google.maps.DirectionsRenderer;
+    // local
+    var origin = [<%= content["start_location"]["lat"] %>, <%= content["start_location"]["lng"] %>];
+    var destination = [<%= content["end_location"]["lat"] %>, <%= content["end_location"]["lng"] %>];
+    var map = new google.maps.Map(document.getElementById("map"), {
+      zoom: 15,
+      center: {
+        lat: origin[0],
+        lng: origin[1]
+      }
+    });
+    directionsDisplay.setMap(map);
+    calculateAndDisplayRoute(origin, destination);
+
+    var userMarker = new google.maps.Marker({
+      position: {
+        lat: origin[0],
+        lng: origin[1]
+      },
+      zIndex: 99,
+      map: map,
+      icon: "<%= image_path("bluedot.png") %>"
+    });
+  }
+
+  function calculateAndDisplayRoute(origin, destination) {
+    directionsService.route({
+      origin: {
+        lat: origin[0],
+        lng: origin[1]
+      },
+      destination: {
+        lat: destination[0],
+        lng: destination[1]
+      },
+      travelMode: "<%= content["travel_mode"] %>"
+    }, function(response, status) {
+      if (status === 'OK') {
+        directionsDisplay.setDirections(response);
+      } else {
+        window.alert('Directions request failed due to ' + status);
+      }
+    });
+  }
+
+  function updateRoute(next = true) {
+    var currentIndex = parseInt($(".carousel-item.active").attr("data-route-index"));
+    var targetIndex = next ? currentIndex + 1 : currentIndex - 1;
+    if(targetIndex < 0 || targetIndex > <%= @route.steps.count - 1 %>) {
+      return;
+    }
+    var target = JSON.parse($(`[data-route-index="${targetIndex}"]`).attr("data-route"));
+    calculateAndDisplayRoute(
+      [target["start_location"]["lat"], target["start_location"]["lng"]],
+      [target["end_location"]["lat"], target["end_location"]["lng"]],
+    );
+  }
+</script>
+</script>
+
+<script async defer src="https://maps.googleapis.com/maps/api/js?key=<%= ENV['GOOGLE_MAP_API_KEY'] %>&callback=initMap"></script>

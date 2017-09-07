@@ -9,7 +9,9 @@ class SearchController < ApplicationController
     @routes = fetch_routes.sort_by do |route|
         route["legs"].first["duration"]["value"]
       end.first(NUM_OF_ROUTES).each do |route|
+        route["destination"] = @destination
         route["id"] = gen_key route["overview_polyline"]["points"]
+        Rails.cache.write(route["id"], route, expires_in: 3.hour)
       end
     set_addresses
   end
