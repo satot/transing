@@ -7,7 +7,6 @@ function getPosition() {
     navigator.geolocation.getCurrentPosition(
       // callback (success)
       function(position) {
-          console.log(position);
           return resolve([position.coords.latitude, position.coords.longitude]);
       },
       // callback (error)
@@ -27,7 +26,7 @@ function getPosition() {
             message = "ELSE(error code:" + error.code + ")";
             break;
         }
-        return rejct(message);
+        return reject(message);
       }
     );
   });

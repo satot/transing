@@ -41,36 +41,30 @@
 <% step = @route.steps.first %>
 <% content = JSON.parse(step.content) %>
 <script type="text/javascript">
+  var marker;
+  var gmaps = {};
+
   function initMap() {
-    // global
-    directionsService = new google.maps.DirectionsService;
-    directionsDisplay = new google.maps.DirectionsRenderer;
-    // local
     var origin = [<%= content["start_location"]["lat"] %>, <%= content["start_location"]["lng"] %>];
     var destination = [<%= content["end_location"]["lat"] %>, <%= content["end_location"]["lng"] %>];
-    var map = new google.maps.Map(document.getElementById("map"), {
+
+    gmaps.directionsService = new google.maps.DirectionsService;
+    gmaps.directionsDisplay = new google.maps.DirectionsRenderer;
+    gmaps.map = new google.maps.Map(document.getElementById("map"), {
       zoom: 15,
       center: {
         lat: origin[0],
         lng: origin[1]
       }
     });
-    directionsDisplay.setMap(map);
+    gmaps.directionsDisplay.setMap(gmaps.map);
     calculateAndDisplayRoute(origin, destination);
-
-    var userMarker = new google.maps.Marker({
-      position: {
-        lat: origin[0],
-        lng: origin[1]
-      },
-      zIndex: 99,
-      map: map,
-      icon: "<%= image_path("bluedot.png") %>"
-    });
+    setMarker(origin);
+    setInterval("updateCurrentLocation()", 3 * 1000);
   }
 
   function calculateAndDisplayRoute(origin, destination) {
-    directionsService.route({
+    gmaps.directionsService.route({
       origin: {
         lat: origin[0],
         lng: origin[1]
@@ -82,10 +76,34 @@
       travelMode: "<%= content["travel_mode"] %>"
     }, function(response, status) {
       if (status === 'OK') {
-        directionsDisplay.setDirections(response);
+        gmaps.directionsDisplay.setDirections(response);
       } else {
         window.alert('Directions request failed due to ' + status);
       }
+    });
+  }
+
+  function setMarker(position){
+    marker = new google.maps.Marker({
+      position: {
+        lat: position[0],
+        lng: position[1]
+      },
+      zIndex: 99,
+      map: gmaps.map,
+      icon: "<%= image_path("bluedot.png") %>"
+    });
+    marker.setMap(gmaps.map);
+  }
+
+  function clearMarker(){
+    marker.setMap(null);
+  }
+
+  function updateCurrentLocation() {
+    getPosition().then(function(position){
+      clearMarker();
+      setMarker(position);
     });
   }
 
