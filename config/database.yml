@@ -51,5 +51,6 @@ test:
 production:
   <<: *default
   database: transing_production
-  username: transing
-  password: <%= ENV['TRANSING_DATABASE_PASSWORD'] %>
+  url: <%= ENV['DATABASE_URL'] %>
+  username: <%= ENV['DATABASE_USERNAME'] %>
+  password: <%= ENV['DATABASE_PASSWORD'] %>

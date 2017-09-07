@@ -12,7 +12,7 @@ function getPosition() {
       },
       // callback (error)
       function(error) {
-        let message = "";
+        var message = "";
         switch(error.code) {
           case 1:
             message = "PERMISSION_DENIED";
