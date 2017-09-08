@@ -1,19 +1,10 @@
 require 'open-uri'
 class SearchController < ApplicationController
   NUM_OF_ROUTES = 3
-  before_action :validate_params, only: [:index]
-  before_action :set_headers
+  before_action :validate_params, :set_destination, :set_routes, :set_headers,
+    :set_addresses, only: [:index]
 
   def index
-    @destination = params[:destination]
-    @routes = fetch_routes.sort_by do |route|
-        route["legs"].first["duration"]["value"]
-      end.first(NUM_OF_ROUTES).each do |route|
-        route["destination"] = @destination
-        route["id"] = gen_key route["overview_polyline"]["points"]
-        Rails.cache.write(route["id"], route, expires_in: 3.hour)
-      end
-    set_addresses
   end
 
   private
@@ -21,8 +12,31 @@ class SearchController < ApplicationController
     params.require([:lat, :lng, :destination])
   end
 
+  def set_destination
+    @destination = params[:destination]
+  end
+
   def set_headers
     @header = "Directions"
+  end
+
+  def set_routes
+    polylines = []
+    @routes = fetch_routes.sort_by do |route|
+        route["legs"].first["duration"]["value"]
+      end.select do |route|
+        # filter out duplicate routes which have the same polyline
+        route["id"] = gen_key route["overview_polyline"]["points"]
+        if polylines.include? route["id"]
+          false
+        else
+          polylines << route["id"]
+          true
+        end
+      end.first(NUM_OF_ROUTES).each do |route|
+        route["destination"] = @destination
+        Rails.cache.write(route["id"], route, expires_in: 3.hour)
+      end
   end
 
   def set_addresses

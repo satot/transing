@@ -20,27 +20,27 @@
   </li>
   <% end %>
 </ul>
-<div class="tab-content" id="myTabContent">
-  <% @routes.each_with_index do |route, idx| %>
-  <% active = idx == 0 ? "show active" : "" %>
-<div class="tab-pane fade <%= active %>" id="route<%= idx %>" role="tabpanel">
-<table class="table mb-5">
-  <tbody>
-  <% leg = route["legs"].first %>
-  <% leg["steps"].each do |step| %>
-    <tr><td>
-      <small class="form-text text-muted"><%= step["travel_mode"] %></small>
-      <span><%= step["html_instructions"] %></span>
-      <small class="form-text text-muted"><%= step["distance"]["text"] %> <%= step["duration"]["text"] %></small>
-    </td></tr>
-  <% end %>
-  </tbody>
-</table>
-</div>
-<%= form_tag('/routes/start', method: "post") do %>
-  <%= hidden_field_tag "route[id]", route["id"], class: "form-control" %>
-<button type="submit" class="btn btn-success btn-block fixed-bottom rounded-0">Start My Journey Now <i class="fa fa-chevron-circle-right" aria-hidden="true"></i></button>
-<% end %>
-  <% end %>
-</div>
 
+<div class="tab-content" id="myTabContent">
+<% @routes.each_with_index do |route, idx| %>
+  <% active = idx == 0 ? "show active" : "" %>
+  <div class="tab-pane fade <%= active %>" id="route<%= idx %>" role="tabpanel">
+    <table class="table mb-5">
+      <tbody>
+      <% leg = route["legs"].first %>
+      <% leg["steps"].each do |step| %>
+        <tr><td>
+          <small class="form-text text-muted"><%= step["travel_mode"] %></small>
+          <span><%= step["html_instructions"] %></span>
+          <small class="form-text text-muted"><%= step["distance"]["text"] %> <%= step["duration"]["text"] %></small>
+        </td></tr>
+      <% end %>
+      </tbody>
+    </table>
+  <%= form_tag('/routes/start', method: "post") do %>
+    <%= hidden_field_tag "route[id]", route["id"], class: "form-control" %>
+    <button type="submit" class="btn btn-success btn-block fixed-bottom rounded-0">Start My Journey Now <i class="fa fa-chevron-circle-right" aria-hidden="true"></i></button>
+  <% end %>
+  </div><!-- .tab-pane.fade -->
+<% end %>
+</div><!-- #myTabContent -->
