@@ -20,27 +20,25 @@
     </td></tr>
   </tbody>
 </table>
-<table class="table">
+<table class="table route-history">
   <thead class="thead-default">
     <tr><th>Recent Journeys</th></tr>
   </thead>
   <tbody>
+  <% if @route_history.empty? %>
     <tr><td>
-      <span>Great World City</span>
-      <small class="form-text text-muted">1 Kim Seng Promenade, Singapore 237994</small>
+      <span>No Journey</span>
     </td></tr>
-    <tr><td>
-      <span>Ubi Techpark</span>
-      <small class="form-text text-muted">10Ubi Crescent, Singapore 408564</small>
-    </td></tr>
-    <tr><td>
-      <span>40R East Coast</span>
-      <small class="form-text text-muted">Singapore 429093</small>
-    </td></tr>
-    <tr><td>
-      <span>The Octagon</span>
-      <small class="form-text text-muted">105 Cecil Street, Singapore 069534</small>
-    </td></tr>
+  <% else %>
+    <% @route_history.each do |route| %>
+      <tr><td>
+        <a href="<%= route_path(route) %>" class="cell">
+        <span><%= route.destination_name %></span>
+        <small class="form-text text-muted"><%= route.destination_address %></small>
+        </a>
+      </td></tr>
+    <% end %>
+  <% end %>
   </tbody>
 </table>
 
