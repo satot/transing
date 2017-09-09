@@ -1,0 +1,104 @@
+<form id="control"></form>
+<div>
+  <video id="video" />
+</div>
+<span id="result"></span>
+<script>
+  var video = document.getElementById("video");
+  var control = document.getElementById("control");
+
+  getVideoSources(function(cam) {
+    console.log("cam", cam);
+    var b = document.createElement("input");
+    b.type = "button";
+    b.className = "btn btn-outline-primary btn-sm";
+    b.value = "Scan QR Code";
+    b.onclick = getMain(cam.id);
+    control.appendChild(b);
+    console.log('add button');
+  });
+
+  function getMain(cam_id) {
+    return function() {
+      main(cam_id);
+    };
+  }
+
+  function main(cam_id) {
+    navigator.getUserMedia({
+      audio: false,
+      video: {
+        optional: [
+          { sourceId: cam_id}
+        ]
+      }
+    }, function(stream) { // success
+      console.log("Start Video", stream);
+      localStream = stream;
+      video.src = URL.createObjectURL(stream);
+      video.play();
+      video.volume = 0;
+      var stop = startReadQR(video, function(obj){
+        stop();
+        success(obj);
+      }, function() {} );
+    }, function(e) { // error
+      console.error("Error on start video: " + e.code);
+    });
+  };
+
+  function success(obj){
+    console.log("Success", obj);
+    result.innerText = JSON.stringify(obj);
+  }
+
+  function startReadQR(video, callback, error){
+    var store = {
+        all_length: 0,
+        length: 0
+    };
+  
+    var state = "run";
+  
+    qrcode.callback = function(res) {
+      if(res == 'error decoding QR Code'){
+        error();
+      } else {
+        console.log("read", res);
+        //receiveQr(res, store, callback);
+        callback(res);
+      }
+    }
+    var videoRead = function() {
+      var w = video.videoWidth;
+      var h = video.videoHeight;
+      var canvas = document.createElement("canvas");
+      canvas.width = w;
+      canvas.height = h;
+      var ctx = canvas.getContext("2d");
+  
+      var draw = function(){
+        if(state == "stop"){
+          return;
+        }
+  
+        requestAnimationFrame(draw);
+        ctx.drawImage(video, 0, 0, w, h);
+        var img = canvas.toDataURL("image/png");
+        qrcode.decode(img);
+      };
+  
+      draw();
+    }
+  
+    if (video.readyState == 0) {
+      video.onloadedmetadata = videoRead;
+    } else {
+      videoRead();
+    }
+  
+    return function(){
+      state = "stop";
+    };
+  }
+</script>

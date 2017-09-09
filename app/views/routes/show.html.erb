@@ -38,6 +38,8 @@
   </div>
 </div>
 
+<%= render partial: 'camera' %>
+
 <% step = @route.steps.first %>
 <% content = JSON.parse(step.content) %>
 <script type="text/javascript">
@@ -119,7 +121,6 @@
       [target["end_location"]["lat"], target["end_location"]["lng"]],
     );
   }
-</script>
 </script>
 
 <script async defer src="https://maps.googleapis.com/maps/api/js?key=<%= ENV['GOOGLE_MAP_API_KEY'] %>&callback=initMap"></script>
