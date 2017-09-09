@@ -52,6 +52,7 @@
     gmaps.directionsService = new google.maps.DirectionsService;
     gmaps.directionsDisplay = new google.maps.DirectionsRenderer;
     gmaps.map = new google.maps.Map(document.getElementById("map"), {
+      maxZoom: 20,
       zoom: 15,
       center: {
         lat: origin[0],
