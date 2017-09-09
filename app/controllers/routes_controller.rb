@@ -1,4 +1,5 @@
 class RoutesController < ApplicationController
+  before_action :set_route_history, only: [:index]
   before_action :set_route, :set_weather, only: [:show]
 
   def index
@@ -34,6 +35,10 @@ class RoutesController < ApplicationController
 
   def set_route
     @route = Route.find(params[:id])
+  end
+
+  def set_route_history
+    @route_history = Route.time_desc.recent.first(5)
   end
 
   def set_weather

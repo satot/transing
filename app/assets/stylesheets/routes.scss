@@ -37,3 +37,16 @@
     color: #000;
   }
 }
+
+.route-history {
+  a.cell {
+    color: #000;
+    width: 100%;
+    height: 100%;
+    display: block;
+    text-decoration: none;
+    &:hover {
+      color: #545454;
+    }
+  }
+}

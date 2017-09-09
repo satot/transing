@@ -47,6 +47,7 @@
   function initMap() {
     var origin = [<%= content["start_location"]["lat"] %>, <%= content["start_location"]["lng"] %>];
     var destination = [<%= content["end_location"]["lat"] %>, <%= content["end_location"]["lng"] %>];
+    var travelMode = "<%= content["travel_mode"] %>";
 
     gmaps.directionsService = new google.maps.DirectionsService;
     gmaps.directionsDisplay = new google.maps.DirectionsRenderer;
@@ -58,12 +59,12 @@
       }
     });
     gmaps.directionsDisplay.setMap(gmaps.map);
-    calculateAndDisplayRoute(origin, destination);
+    calculateAndDisplayRoute(origin, destination, travelMode);
     setMarker(origin);
     setInterval("updateCurrentLocation()", 3 * 1000);
   }
 
-  function calculateAndDisplayRoute(origin, destination) {
+  function calculateAndDisplayRoute(origin, destination, travelMode) {
     gmaps.directionsService.route({
       origin: {
         lat: origin[0],
@@ -73,7 +74,7 @@
         lat: destination[0],
         lng: destination[1]
       },
-      travelMode: "<%= content["travel_mode"] %>"
+      travelMode: travelMode
     }, function(response, status) {
       if (status === 'OK') {
         gmaps.directionsDisplay.setDirections(response);
@@ -117,6 +118,7 @@
     calculateAndDisplayRoute(
       [target["start_location"]["lat"], target["start_location"]["lng"]],
       [target["end_location"]["lat"], target["end_location"]["lng"]],
+      target["travel_mode"]
     );
   }
 </script>
