@@ -1,25 +1,34 @@
 <div id="map" style="width:100%; height:500px"></div>
 
-<div id="routesCarousel" class="carousel slide" data-ride="carousel" data-interval="false" data-wrap="false">
+<div id="routesCarousel" class="carousel slide mb-5" data-ride="carousel" data-interval="false" data-wrap="false">
   <ol class="carousel-indicators carousel-indicators--round fixed-bottom">
-<% @route.steps.each_with_index do |step, idx| %>
+<% @steps.each_with_index do |step, idx| %>
 <% active = idx === 0 ? "active" : "" %>
     <li data-target="#routesCarousel" data-slide-to="<%= idx %>" class="<%= active %>"></li>
 <% end %>
   </ol>
 
   <div class="carousel-inner">
-<% @route.steps.each_with_index do |step, idx| %>
-<% content = JSON.parse(step.content) %>
+<% @steps.each_with_index do |step, idx| %>
 <% active = idx === 0 ? "active" : "" %>
-<div class="carousel-item <%= active %>" data-route-index="<%= idx %>" data-route="<%= content.to_json %>">
+<div class="carousel-item <%= active %>" data-route-index="<%= idx %>" data-route="<%= step.content %>">
 <table class="table">
   <tbody>
-    <tr><td>
-      <small class="form-text text-muted"><%= content["travel_mode"] %></small>
-      <span><%= content["html_instructions"] %></span>
-      <small class="form-text text-muted"><%= content["distance"]["text"] + " " + content["duration"]["text"] %></small>
-    </td></tr>
+    <% if step.body["departure"].present? %>
+      <tr><td>
+        <small class="form-text text-muted">Wait <%= step.body["vehicle"] %> at</small>
+        <span><%= step.body["departure"] %></span>
+      </td></tr>
+      <% if step.body["vehicle"] == "Bus" && step.body["bus_stop_services"] %>
+        <%= render partial: "bus-arrivals", locals: {services: step.body["bus_stop_services"]} %>
+      <% end %>
+    <% else %>
+      <tr><td>
+        <small class="form-text text-muted"><%= step.travel_mode %></small>
+        <span><%= step.html_instructions %></span>
+        <small class="form-text text-muted"><%= step.distance + " " + step.duration %></small>
+      </td></tr>
+    <% end %>
   </tbody>
 </table>
 </div>
@@ -38,91 +47,4 @@
   </div>
 </div>
 
-<% step = @route.steps.first %>
-<% content = JSON.parse(step.content) %>
-<script type="text/javascript">
-  var marker;
-  var gmaps = {};
-
-  function initMap() {
-    var origin = [<%= content["start_location"]["lat"] %>, <%= content["start_location"]["lng"] %>];
-    var destination = [<%= content["end_location"]["lat"] %>, <%= content["end_location"]["lng"] %>];
-    var travelMode = "<%= content["travel_mode"] %>";
-
-    gmaps.directionsService = new google.maps.DirectionsService;
-    gmaps.directionsDisplay = new google.maps.DirectionsRenderer;
-    gmaps.map = new google.maps.Map(document.getElementById("map"), {
-      maxZoom: 20,
-      zoom: 15,
-      center: {
-        lat: origin[0],
-        lng: origin[1]
-      }
-    });
-    gmaps.directionsDisplay.setMap(gmaps.map);
-    calculateAndDisplayRoute(origin, destination, travelMode);
-    setMarker(origin);
-    setInterval("updateCurrentLocation()", 3 * 1000);
-  }
-
-  function calculateAndDisplayRoute(origin, destination, travelMode) {
-    gmaps.directionsService.route({
-      origin: {
-        lat: origin[0],
-        lng: origin[1]
-      },
-      destination: {
-        lat: destination[0],
-        lng: destination[1]
-      },
-      travelMode: travelMode
-    }, function(response, status) {
-      if (status === 'OK') {
-        gmaps.directionsDisplay.setDirections(response);
-      } else {
-        window.alert('Directions request failed due to ' + status);
-      }
-    });
-  }
-
-  function setMarker(position){
-    marker = new google.maps.Marker({
-      position: {
-        lat: position[0],
-        lng: position[1]
-      },
-      zIndex: 99,
-      map: gmaps.map,
-      icon: "<%= image_path("bluedot.png") %>"
-    });
-    marker.setMap(gmaps.map);
-  }
-
-  function clearMarker(){
-    marker.setMap(null);
-  }
-
-  function updateCurrentLocation() {
-    getPosition().then(function(position){
-      clearMarker();
-      setMarker(position);
-    });
-  }
-
-  function updateRoute(next = true) {
-    var currentIndex = parseInt($(".carousel-item.active").attr("data-route-index"));
-    var targetIndex = next ? currentIndex + 1 : currentIndex - 1;
-    if(targetIndex < 0 || targetIndex > <%= @route.steps.count - 1 %>) {
-      return;
-    }
-    var target = JSON.parse($(`[data-route-index="${targetIndex}"]`).attr("data-route"));
-    calculateAndDisplayRoute(
-      [target["start_location"]["lat"], target["start_location"]["lng"]],
-      [target["end_location"]["lat"], target["end_location"]["lng"]],
-      target["travel_mode"]
-    );
-  }
-</script>
-</script>
-
-<script async defer src="https://maps.googleapis.com/maps/api/js?key=<%= ENV['GOOGLE_MAP_API_KEY'] %>&callback=initMap"></script>
+<%= render partial: "map-scripts", locals: {step: @steps.first} %>

@@ -1,0 +1,93 @@
+<script type="text/javascript">
+  var marker;
+  var gmaps = {};
+
+  function initMap() {
+    var origin = [<%= step.start_location["lat"] %>, <%= step.start_location["lng"] %>];
+    var destination = [<%= step.end_location["lat"] %>, <%= step.end_location["lng"] %>];
+    var travelMode = "<%= step.travel_mode %>";
+
+    gmaps.directionsService = new google.maps.DirectionsService;
+    gmaps.directionsDisplay = new google.maps.DirectionsRenderer;
+    gmaps.map = new google.maps.Map(document.getElementById("map"), {
+      maxZoom: 20,
+      zoom: 15,
+      center: {
+        lat: origin[0],
+        lng: origin[1]
+      }
+    });
+    gmaps.directionsDisplay.setMap(gmaps.map);
+    calculateAndDisplayRoute(origin, destination, travelMode);
+    setMarker(origin);
+    setInterval("updateCurrentLocation()", 3 * 1000);
+  }
+
+  function calculateAndDisplayRoute(origin, destination, travelMode, transitOptions = {}) {
+    gmaps.directionsService.route({
+      origin: {
+        lat: origin[0],
+        lng: origin[1]
+      },
+      destination: {
+        lat: destination[0],
+        lng: destination[1]
+      },
+      travelMode: travelMode,
+      transitOptions: transitOptions
+    }, function(response, status) {
+      if (status === 'OK') {
+        gmaps.directionsDisplay.setDirections(response);
+      } else {
+        window.alert('Directions request failed due to ' + status);
+      }
+    });
+  }
+
+  function setMarker(position){
+    marker = new google.maps.Marker({
+      position: {
+        lat: position[0],
+        lng: position[1]
+      },
+      zIndex: 99,
+      map: gmaps.map,
+      icon: "<%= image_path("bluedot.png") %>"
+    });
+    marker.setMap(gmaps.map);
+  }
+
+  function clearMarker(){
+    marker.setMap(null);
+  }
+
+  function updateCurrentLocation() {
+    getPosition().then(function(position){
+      clearMarker();
+      setMarker(position);
+    });
+  }
+
+  function updateRoute(next = true) {
+    var currentIndex = parseInt($(".carousel-item.active").attr("data-route-index"));
+    var targetIndex = next ? currentIndex + 1 : currentIndex - 1;
+    if(targetIndex < 0 || targetIndex > <%= @steps.count - 1 %>) {
+      return;
+    }
+    var target = JSON.parse($(`[data-route-index="${targetIndex}"]`).attr("data-route"));
+    var travelMode = target["travel_mode"];
+    var transitOptions = {};
+    if(travelMode === "TRANSIT") {
+      transitOptions["modes"] = [target["transit_details"]["line"]["vehicle"]["type"]];
+    }
+    calculateAndDisplayRoute(
+      [target["start_location"]["lat"], target["start_location"]["lng"]],
+      [target["end_location"]["lat"], target["end_location"]["lng"]],
+      travelMode,
+      transitOptions
+    );
+  }
+</script>
+</script>
+
+<script async defer src="https://maps.googleapis.com/maps/api/js?key=<%= ENV['GOOGLE_MAP_API_KEY'] %>&callback=initMap"></script>

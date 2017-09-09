@@ -1,0 +1,10 @@
+<% services.each do |service| %>
+<tr class="bus-arrivals">
+<td>
+  <span>Bus <%= service["ServiceNo"] %></span>
+</td><td>
+  <span class="min"><%= RoutesHelper.min_to_arrival service["NextBus"]["EstimatedArrival"] %></span>
+  <% next_arrivals = [service["NextBus2"]["EstimatedArrival"], service["NextBus3"]["EstimatedArrival"]].select(&:present?).map{|a| RoutesHelper.min_to_arrival(a)}.join(", ") %>
+  <small class="ml-2"><%= next_arrivals %></small>
+</td></tr>
+<% end %>
