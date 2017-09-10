@@ -34,9 +34,9 @@ class RoutesController < ApplicationController
   end
 
   def set_steps
-    route = Route.find params[:id]
+    @route = Route.find params[:id]
     @steps = []
-    route.steps.each do |s|
+    @route.steps.each do |s|
       if s.travel_mode == Step::TRAVEL_MODE_TRANSIT
         @steps << setup_waiting_step(s)
         if s.by_bus?

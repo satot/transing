@@ -54,6 +54,19 @@ $white: #fff;
   }
 }
 
+.navbar-brand {
+  .direction {
+    line-height: 1.25rem;
+    text-align: center;
+    p.header{
+      margin-bottom: 0;
+    }
+    #eta {
+      font-size: 0.75rem;
+    }
+  }
+}
+
 .bus-stops {
   li {
     border: none;

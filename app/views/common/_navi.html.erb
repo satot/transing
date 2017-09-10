@@ -4,7 +4,12 @@
   <div class="p-2">
     <a style="color:black;" href="/"><i class="fa fa-lg fa-angle-left" aria-hidden="true"></i></a>
   </div>
-  <div class="p-2"><%= @header %></div>
+  <div class="p-2 direction">
+    <p class="header"><%= @header %></p>
+    <% if @route %>
+      <small id="eta"><%= @route.eta.strftime("%k:%m %P") %> . <%= @route.duration.round %>min</small>
+    <% end %>
+  </div>
   <div class="p-2"><span class="weather"><%= RoutesHelper.to_weather_icon @weather %></span></div>
 </div>
 <% else %>
