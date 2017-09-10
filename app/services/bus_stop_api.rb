@@ -7,10 +7,16 @@ class BusStopApi
   class << self
     BUS_ARRIVALS = "bus_arrivals"
     PATH_BUSSTOPS = "/ltaodataservice/BusStops"
+    PATH_BUSROUTES = "/ltaodataservice/BusRoutes"
     PATH_ARRIVAL = "/ltaodataservice/BusArrivalv2"
 
     def get_bus_stops offset = 0
       res = fetch build_url(PATH_BUSSTOPS, query_skip(offset))
+      res["value"] || []
+    end
+
+    def get_bus_routes offset = 0
+      res = fetch build_url(PATH_BUSROUTES, query_skip(offset))
       res["value"] || []
     end
 

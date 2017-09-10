@@ -10,7 +10,19 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20170909122627) do
+ActiveRecord::Schema.define(version: 20170910014731) do
+
+  create_table "bus_routes", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8" do |t|
+    t.string "service_no"
+    t.string "operator"
+    t.integer "direction"
+    t.integer "stop_sequence"
+    t.string "bus_stop_code"
+    t.string "integer"
+    t.float "distance", limit: 24
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+  end
 
   create_table "bus_stops", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8" do |t|
     t.integer "code"

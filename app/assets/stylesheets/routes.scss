@@ -54,12 +54,20 @@ $white: #fff;
   }
 }
 
+.bus-stops {
+  li {
+    border: none;
+    padding-left: 0;
+    padding-bottom: 0;
+  }
+}
 .bus-arrivals {
   color: $white;
-  span.min {
+  p.min {
     font-weight: bold;
+    margin-bottom: 0rem;
     &:after {
-      font-size: 0.25rem;
+      font-size: 0.5rem;
       content: " min"
     }
   }

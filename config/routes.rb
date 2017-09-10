@@ -4,6 +4,7 @@ Rails.application.routes.draw do
     collection do
       get :index
       post :start
+      get :bus_arrivals_ajax
     end
   end
   resources :search, only: [:index]
