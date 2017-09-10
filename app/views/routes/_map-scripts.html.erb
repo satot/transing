@@ -65,7 +65,30 @@
     getPosition().then(function(position){
       clearMarker();
       setMarker(position);
+      remindArrival(position);
     });
+  }
+
+  var currentRoute = {};
+  var showRemind = false;
+  function remindArrival(position) {
+    var NEAR = 0.0030;
+    var travelMode = currentRoute["travel_mode"];
+    if(travelMode !== "TRANSIT" || showRemind) {
+      return;
+    }
+    if(distance(position[0], position[1]) < NEAR){
+      showRemind = true;
+      var stop = currentRoute.transit_details.arrival_stop.name;
+      alert("Alight at next stop - " + stop);
+    }
+  }
+
+  function distance(lat, lng) {
+    return Math.sqrt(
+      (currentRoute["start_location"]["lat"] - lat) ** 2 +
+      (currentRoute["start_location"]["lng"] - lng) ** 2
+    );
   }
 
   function updateRoute(next = true) {
@@ -74,18 +97,19 @@
     if(targetIndex < 0 || targetIndex > <%= @steps.count - 1 %>) {
       return;
     }
-    var target = JSON.parse($(`[data-route-index="${targetIndex}"]`).attr("data-route"));
-    var travelMode = target["travel_mode"];
+    currentRoute = JSON.parse($(`[data-route-index="${targetIndex}"]`).attr("data-route"));
+    var travelMode = currentRoute["travel_mode"];
     var transitOptions = {};
     if(travelMode === "TRANSIT") {
-      transitOptions["modes"] = [target["transit_details"]["line"]["vehicle"]["type"]];
+      transitOptions["modes"] = [currentRoute["transit_details"]["line"]["vehicle"]["type"]];
     }
     calculateAndDisplayRoute(
-      [target["start_location"]["lat"], target["start_location"]["lng"]],
-      [target["end_location"]["lat"], target["end_location"]["lng"]],
+      [currentRoute["start_location"]["lat"], currentRoute["start_location"]["lng"]],
+      [currentRoute["end_location"]["lat"], currentRoute["end_location"]["lng"]],
       travelMode,
       transitOptions
     );
+    showRemind = false;
   }
 </script>
 </script>
