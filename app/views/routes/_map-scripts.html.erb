@@ -86,8 +86,8 @@
 
   function distance(lat, lng) {
     return Math.sqrt(
-      (currentRoute["start_location"]["lat"] - lat) ** 2 +
-      (currentRoute["start_location"]["lng"] - lng) ** 2
+      (currentRoute["end_location"]["lat"] - lat) ** 2 +
+      (currentRoute["end_location"]["lng"] - lng) ** 2
     );
   }
 

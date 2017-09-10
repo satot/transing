@@ -36,26 +36,44 @@ class RoutesController < ApplicationController
   def set_steps
     route = Route.find params[:id]
     @steps = []
-    route.steps.each_with_index do |s, i|
+    route.steps.each do |s|
       if s.travel_mode == Step::TRAVEL_MODE_TRANSIT
-        content = {
-          travel_mode: Step::TRAVEL_MODE_WALKING,
-          start_location: s.start_location,
-          end_location: s.start_location, #same as start
-          vehicle: s.vehicle,
-          departure: s.transit_details["departure_stop"]["name"]
-        }
+        @steps << setup_waiting_step(s)
         if s.by_bus?
-          bus_stop_code = BusStop.find_nearest(
-            s.start_location["lat"], s.start_location["lng"]).code
-          content[:bus_stop_code] = bus_stop_code
-          content[:bus_stop_services] =
-            BusStopApi.get_arrival_times(bus_stop_code)
+          org = BusStop.find_nearest(
+            s.start_location["lat"], s.start_location["lng"])
+          dest = BusStop.find_nearest(
+            s.end_location["lat"], s.end_location["lng"])
+          content = JSON.parse(s.content)
+          content["bus_stops"] = BusRoute.available_routes(org, dest)
+          s.content = content.to_json
         end
-        @steps << Step.new(route: s.route, content: content.to_json)
       end
       @steps << s
     end
+  end
+
+  def setup_waiting_step step
+    content = {
+      travel_mode: Step::TRAVEL_MODE_WALKING,
+      start_location: step.start_location,
+      end_location: step.start_location, #same as start
+      vehicle: step.vehicle,
+      departure: step.transit_details["departure_stop"]["name"]
+    }
+    if step.by_bus?
+      origin = BusStop.find_nearest(
+        step.start_location["lat"], step.start_location["lng"])
+      dest = BusStop.find_nearest(
+        step.end_location["lat"], step.end_location["lng"])
+      services = BusRoute.available_services(origin, dest)
+      content[:bus_stop_code] = origin.code
+      content[:bus_stop_services] =
+        BusStopApi.get_arrival_times(origin.code).select do |service|
+          services.include? service["ServiceNo"]
+        end
+    end
+    Step.new(route: step.route, content: content.to_json)
   end
 
   def set_route_history

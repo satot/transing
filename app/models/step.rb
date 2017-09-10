@@ -19,6 +19,10 @@ class Step < ApplicationRecord
     transit_details["line"]["vehicle"]["name"]
   end
 
+  def transit?
+    travel_mode == TRAVEL_MODE_TRANSIT
+  end
+
   def by_bus?
     vehicle.capitalize == "Bus"
   end

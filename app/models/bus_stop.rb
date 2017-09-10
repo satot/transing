@@ -1,4 +1,5 @@
 class BusStop < ApplicationRecord
+  has_many :bus_routes, primary_key: "code", foreign_key: "bus_stop_code"
 
   def distance latitude, longitude
     Math.sqrt((lat - latitude) ** 2 + (lng - longitude) ** 2)
@@ -17,7 +18,9 @@ class BusStop < ApplicationRecord
     end
 
     def find_nearest latitude, longitude
-      all.sort_by{|bs| bs.distance(latitude, longitude)}.first
+      Rails.cache.fetch("#{latitude}:#{longitude}", expires_in: 12.hour) do
+        all.sort_by{|bs| bs.distance(latitude, longitude)}.first
+      end
     end
   end
 end

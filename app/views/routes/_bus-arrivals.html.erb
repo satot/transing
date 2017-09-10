@@ -3,7 +3,7 @@
 <td>
   <span>Bus <%= service["ServiceNo"] %></span>
 </td><td>
-  <span class="min"><%= RoutesHelper.min_to_arrival service["NextBus"]["EstimatedArrival"] %></span>
+  <p class="min"><%= RoutesHelper.min_to_arrival service["NextBus"]["EstimatedArrival"] %></p>
   <% next_arrivals = [service["NextBus2"]["EstimatedArrival"], service["NextBus3"]["EstimatedArrival"]].select(&:present?).map{|a| RoutesHelper.min_to_arrival(a)}.join(", ") %>
   <small class="ml-2"><%= next_arrivals %></small>
 </td></tr>

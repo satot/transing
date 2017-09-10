@@ -28,6 +28,18 @@
         <span><%= step.html_instructions %></span>
         <small class="form-text text-muted"><%= step.distance + " " + step.duration %></small>
       </td></tr>
+      <% if step.transit? && step.by_bus? && step.body["bus_stops"] %>
+      <tr class="bus-stops"><td>
+        <ul class="list-group">
+        <% step.body["bus_stops"].first.each do |bs| %>
+        <li class="list-group-item">
+          <i class="fa fa-circle-thin mr-3" aria-hidden="true"></i>
+          <small class="bus-stop"><%= bs["name"] %></small>
+        </li>
+        <% end %>
+        </ul>
+      </td></tr>
+      <% end %>
     <% end %>
   </tbody>
 </table>
